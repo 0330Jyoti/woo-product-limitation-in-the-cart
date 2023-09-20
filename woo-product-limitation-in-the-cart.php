@@ -119,9 +119,29 @@ function woo_product_limitation_settings_page() {
 
 
 
-add_filter( 'woocommerce_add_to_cart_validation', 'geekerhub_only_two_in_cart', 9999 );
-   
-function geekerhub_only_two_in_cart( $passed ) {
-   wc_empty_cart();
-   return $passed;
+// Hook into the WooCommerce add to cart validation process
+add_filter('woocommerce_add_to_cart_validation', 'geekerhub_limit_items_in_cart', 10, 3);
+
+function geekerhub_limit_items_in_cart($passed, $product_id, $quantity) {
+    // Get the maximum allowed quantity from the WordPress option
+    $max_allowed_quantity = get_option('woo_product_limit', 10); // Default value is 10
+    
+    // Get the cart contents
+    $cart = WC()->cart->get_cart();
+    
+    // Calculate the total quantity of items currently in the cart
+    $total_quantity_in_cart = 0;
+    
+    foreach ($cart as $cart_item_key => $cart_item) {
+        $total_quantity_in_cart += $cart_item['quantity'];
+    }
+    
+    // Check if adding the current product will exceed the limit
+    if (($total_quantity_in_cart + $quantity) > $max_allowed_quantity) {
+        // Display an error message to the user
+        wc_add_notice(__('Sorry, you can only add a maximum of ' . $max_allowed_quantity . ' items to your cart.', 'woocommerce'), 'error');
+        $passed = false;
+    }
+    
+    return $passed;
 }
