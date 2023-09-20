@@ -7,6 +7,8 @@ Auhtor: Jyoti
 */
 
 
+// Hook to add the menu
+add_action('admin_menu', 'add_plugin_menu');
 
 // Add a menu page
 function add_plugin_menu() {
@@ -114,8 +116,7 @@ function woo_product_limitation_settings_page() {
     echo '</div>';
 }
 
-// Hook to add the menu
-add_action('admin_menu', 'add_plugin_menu');
+
 
 
 add_filter( 'woocommerce_add_to_cart_validation', 'geekerhub_only_two_in_cart', 9999 );
